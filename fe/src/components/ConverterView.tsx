@@ -103,23 +103,32 @@ function TextToSignMode() {
     setIsConverting(true);
     
     try {
-      // Here you would typically call your backend API
-      // For now, we'll simulate the backend response
-      // const response = await fetch('/api/text-to-sign', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ text: inputText })
-      // });
-      // const data = await response.json();
+      // Call the backend API to translate text to sign words
+      const response = await fetch('http://localhost:3001/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: inputText })
+      });
       
-      // Simulate backend processing delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
       
-      // Simulate backend response - in real implementation, this would come from your API
-      setWordsToAnimate(inputText.toLowerCase().trim());
+      const data = await response.json();
+      console.log('Received translation:', data);
+      
+      // Set the words to animate based on the API response
+      if (data && data.translation) {
+        setWordsToAnimate(data.translation);
+        console.log('Models to animate:', data.translation.split(' ').map((word: string) => `${word}.glb`));
+      } else {
+        console.error('Translation response missing expected format:', data);
+        alert('Unexpected response format from translation service');
+      }
       
     } catch (error) {
       console.error('Conversion failed:', error);
+      alert('Failed to convert text. Please try again.');
     } finally {
       setIsConverting(false);
     }
