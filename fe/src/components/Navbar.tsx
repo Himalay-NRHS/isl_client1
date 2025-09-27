@@ -1,17 +1,17 @@
 
-import { Sun, Moon, Globe } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
-import type { Language } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
+import { LanguageDropdown } from './LanguageDropdown';
 
 interface NavbarProps {
   currentView: 'converter' | 'learn';
   onViewChange: (view: 'converter' | 'learn') => void;
-  language: Language;
-  onLanguageChange: (lang: Language) => void;
 }
 
-export function Navbar({ currentView, onViewChange, language, onLanguageChange }: NavbarProps) {
+export function Navbar({ currentView, onViewChange }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
 
   return (
     <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-6 py-4 transition-colors duration-200">
@@ -23,7 +23,7 @@ export function Navbar({ currentView, onViewChange, language, onLanguageChange }
               <span className="text-white font-bold text-lg">👋</span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              ISL Converter
+              {t('nav.title')}
             </h1>
           </div>
           
@@ -37,7 +37,7 @@ export function Navbar({ currentView, onViewChange, language, onLanguageChange }
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              Converter
+              {t('nav.converter')}
             </button>
             <button
               onClick={() => onViewChange('learn')}
@@ -47,23 +47,15 @@ export function Navbar({ currentView, onViewChange, language, onLanguageChange }
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
-              Learn ISL
+              {t('nav.learn')}
             </button>
           </div>
         </div>
 
         {/* Controls */}
         <div className="flex items-center space-x-4">
-          {/* Language Toggle */}
-          <button
-            onClick={() => onLanguageChange(language === 'en' ? 'gu' : 'en')}
-            className="flex items-center space-x-2 px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-          >
-            <Globe className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {language === 'en' ? 'English' : 'ગુજરાતી'}
-            </span>
-          </button>
+          {/* Language Dropdown */}
+          <LanguageDropdown />
 
           {/* Theme Toggle */}
           <button
@@ -89,7 +81,7 @@ export function Navbar({ currentView, onViewChange, language, onLanguageChange }
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
-          Converter
+          {t('nav.converter')}
         </button>
         <button
           onClick={() => onViewChange('learn')}
@@ -99,7 +91,7 @@ export function Navbar({ currentView, onViewChange, language, onLanguageChange }
               : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
           }`}
         >
-          Learn ISL
+          {t('nav.learn')}
         </button>
       </div>
     </nav>
