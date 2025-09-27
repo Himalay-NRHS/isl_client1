@@ -1,5 +1,5 @@
 export type Mode = 'sign-to-text' | 'text-to-sign';
-export type Language = 'en' | 'gu';
+export type Language = 'en' | 'hi' | 'kn' | 'gu' | 'ta' | 'te' | 'bn' | 'mr' | 'pa' | 'ml';
 export type Theme = 'light' | 'dark';
 
 export interface LearningModule {

@@ -1,17 +1,17 @@
 import { X, Play, Volume2, Info } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import GLBViewer from './GLBViewer';
 import type { SignModel } from '../data/models';
-import type { Language } from '../types';
 
 interface ModelModalProps {
   model: SignModel | null;
   isOpen: boolean;
   onClose: () => void;
-  language: Language;
 }
 
-export function ModelModal({ model, isOpen, onClose, language }: ModelModalProps) {
+export function ModelModal({ model, isOpen, onClose }: ModelModalProps) {
+  const { t } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(false);
 
   // Close modal on Escape key
@@ -66,7 +66,7 @@ export function ModelModal({ model, isOpen, onClose, language }: ModelModalProps
                 {model.cleanName}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'en' ? model.cleanName : model.gujaratiName}
+                {t(`models.${model.name.toLowerCase().replace(/[^a-z0-9]/g, '')}`) || model.cleanName}
               </p>
             </div>
           </div>
@@ -113,10 +113,7 @@ export function ModelModal({ model, isOpen, onClose, language }: ModelModalProps
             >
               <Play className="w-5 h-5" />
               <span>
-                {isPlaying 
-                  ? (language === 'en' ? 'Playing...' : 'ચાલી રહ્યું છે...') 
-                  : (language === 'en' ? 'Play Sign' : 'સાઇન ચલાવો')
-                }
+                {isPlaying ? t('modal.loading') : t('modal.replay')}
               </span>
             </button>
             
@@ -127,7 +124,7 @@ export function ModelModal({ model, isOpen, onClose, language }: ModelModalProps
             >
               <Volume2 className="w-5 h-5" />
               <span>
-                {language === 'en' ? 'Audio' : 'ઓડિયો'}
+                Audio
               </span>
             </button>
           </div>
@@ -140,30 +137,32 @@ export function ModelModal({ model, isOpen, onClose, language }: ModelModalProps
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  {language === 'en' ? 'About this sign' : 'આ સાઇન વિશે'}
+                  About this sign
                 </h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <span className="font-medium text-gray-600 dark:text-gray-400">
-                      {language === 'en' ? 'English:' : 'અંગ્રેજી:'}
+                      English:
                     </span>
                     <p className="text-gray-900 dark:text-white">{model.cleanName}</p>
                   </div>
                   
                   <div>
                     <span className="font-medium text-gray-600 dark:text-gray-400">
-                      {language === 'en' ? 'Gujarati:' : 'ગુજરાતી:'}
+                      Translation:
                     </span>
-                    <p className="text-gray-900 dark:text-white">{model.gujaratiName}</p>
+                    <p className="text-gray-900 dark:text-white">
+                      {t(`models.${model.name.toLowerCase().replace(/[^a-z0-9]/g, '')}`) || model.cleanName}
+                    </p>
                   </div>
                   
                   <div>
                     <span className="font-medium text-gray-600 dark:text-gray-400">
-                      {language === 'en' ? 'Category:' : 'કેટેગરી:'}
+                      {t('modal.category')}:
                     </span>
                     <p className="text-gray-900 dark:text-white capitalize">
-                      {model.category.replace(/([A-Z])/g, ' $1').trim()}
+                      {t(`categories.${model.category}`)}
                     </p>
                   </div>
                 </div>
@@ -171,7 +170,7 @@ export function ModelModal({ model, isOpen, onClose, language }: ModelModalProps
                 {model.description && (
                   <div className="mt-4">
                     <span className="font-medium text-gray-600 dark:text-gray-400">
-                      {language === 'en' ? 'Description:' : 'વર્ણન:'}
+                      Description:
                     </span>
                     <p className="text-gray-900 dark:text-white mt-1">
                       {model.description}
@@ -185,13 +184,13 @@ export function ModelModal({ model, isOpen, onClose, language }: ModelModalProps
           {/* Learning Tips */}
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-6">
             <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">
-              💡 {language === 'en' ? 'Learning Tips' : 'શીખવાની ટિપ્સ'}
+              💡 Learning Tips
             </h3>
             <ul className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-              <li>• {language === 'en' ? 'Watch the hand movements carefully' : 'હાથની હિલચાલને ધ્યાનથી જુઓ'}</li>
-              <li>• {language === 'en' ? 'Practice the sign slowly at first' : 'પહેલા ધીમેથી સાઇનનો અભ્યાસ કરો'}</li>
-              <li>• {language === 'en' ? 'Pay attention to hand shape and position' : 'હાથના આકાર અને સ્થિતિ પર ધ્યાન આપો'}</li>
-              <li>• {language === 'en' ? 'Repeat until the movement feels natural' : 'હલનચલન કુદરતી લાગે ત્યાં સુધી પુનરાવર્તન કરો'}</li>
+              <li>• Watch the hand movements carefully</li>
+              <li>• Practice the sign slowly at first</li>
+              <li>• Pay attention to hand shape and position</li>
+              <li>• Repeat until the movement feels natural</li>
             </ul>
           </div>
         </div>

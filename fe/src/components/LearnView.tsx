@@ -3,14 +3,11 @@ import { useState, useMemo } from 'react';
 import { ModelCard } from './ModelCard';
 import { ModelModal } from './ModelModal';
 import { signModels, modelCategories, searchModels } from '../data/models';
-import type { Language } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { SignModel } from '../data/models';
 
-interface LearnViewProps {
-  language: Language;
-}
-
-export function LearnView({ language }: LearnViewProps) {
+export function LearnView() {
+  const { t } = useLanguage();
   const [selectedModel, setSelectedModel] = useState<SignModel | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -65,13 +62,10 @@ export function LearnView({ language }: LearnViewProps) {
           <span className="text-4xl">🤟</span>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-          {language === 'en' ? 'Learn Indian Sign Language (ISL)' : 'ભારતીય સાઇન લેંગ્વેજ (ISL) શીખો'}
+          {t('learn.title')}
         </h1>
         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          {language === 'en' 
-            ? 'Explore our comprehensive collection of ISL signs. Click on any card to see the 3D demonstration.'
-            : 'ISL સાઇનના અમારા વ્યાપક સંગ્રહનું અન્વેષણ કરો. 3D દર્શન જોવા માટે કોઈપણ કાર્ડ પર ક્લિક કરો.'
-          }
+          {t('learn.subtitle')}
         </p>
       </div>
 
@@ -82,7 +76,7 @@ export function LearnView({ language }: LearnViewProps) {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
           <input
             type="text"
-            placeholder={language === 'en' ? 'Search signs...' : 'સાઇન શોધો...'}
+            placeholder={t('learn.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
@@ -100,7 +94,7 @@ export function LearnView({ language }: LearnViewProps) {
             }`}
           >
             <Filter className="w-4 h-4 inline mr-2" />
-            {language === 'en' ? 'All Categories' : 'બધી કેટેગરીઓ'}
+            {t('learn.allCategories')}
           </button>
           
           {Object.entries(modelCategories).map(([key, category]) => (
@@ -114,7 +108,7 @@ export function LearnView({ language }: LearnViewProps) {
               }`}
             >
               <span className="mr-2">{category.icon}</span>
-              {language === 'en' ? category.name : category.gujaratiName}
+              {t(`categories.${key}`)}
             </button>
           ))}
         </div>
@@ -123,10 +117,7 @@ export function LearnView({ language }: LearnViewProps) {
       {/* Statistics */}
       <div className="mb-8 text-center">
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          {language === 'en' 
-            ? `Showing ${filteredModels.length} of ${signModels.length} signs`
-            : `${signModels.length} માંથી ${filteredModels.length} સાઇન દર્શાવી રહ્યા છીએ`
-          }
+          {t('learn.showingResults', { count: filteredModels.length, total: signModels.length })}
         </p>
       </div>
 
@@ -135,13 +126,10 @@ export function LearnView({ language }: LearnViewProps) {
         <div className="text-center py-12">
           <div className="text-6xl mb-4">🔍</div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            {language === 'en' ? 'No signs found' : 'કોઈ સાઇન મળ્યા નથી'}
+            {t('learn.noSignsFound')}
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {language === 'en' 
-              ? 'Try adjusting your search or filter criteria'
-              : 'તમારા શોધ અથવા ફિલ્ટર માપદંડોને સમાયોજિત કરવાનો પ્રયાસ કરો'
-            }
+            {t('learn.tryAdjusting')}
           </p>
         </div>
       ) : (
@@ -156,13 +144,10 @@ export function LearnView({ language }: LearnViewProps) {
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {language === 'en' 
-                        ? modelCategories[categoryKey]?.name || categoryKey
-                        : modelCategories[categoryKey]?.gujaratiName || categoryKey
-                      }
+                      {t(`categories.${categoryKey}`)}
                     </h2>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {models.length} {language === 'en' ? 'signs' : 'સાઇન'}
+                      {models.length} {t('learn.signs')}
                     </p>
                   </div>
                 </div>
@@ -174,7 +159,6 @@ export function LearnView({ language }: LearnViewProps) {
                   <ModelCard
                     key={model.id}
                     model={model}
-                    language={language}
                     onClick={() => handleModelClick(model)}
                   />
                 ))}
@@ -188,25 +172,25 @@ export function LearnView({ language }: LearnViewProps) {
       <div className="mt-16 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-3xl p-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            {language === 'en' ? 'Your Learning Journey' : 'તમારી શીખવાની યાત્રા'}
+            {t('learn.yourLearningJourney')}
           </h2>
           <div className="flex justify-center space-x-8">
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{signModels.length}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'en' ? 'Total Signs' : 'કુલ સાઇન'}
+                {t('learn.totalSigns')}
               </div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600 dark:text-green-400">{Object.keys(modelCategories).length}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'en' ? 'Categories' : 'કેટેગરીઓ'}
+                {t('learn.categories')}
               </div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">3D</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'en' ? 'Interactive' : 'ઇન્ટરેક્ટિવ'}
+                {t('learn.interactive')}
               </div>
             </div>
           </div>
@@ -218,7 +202,6 @@ export function LearnView({ language }: LearnViewProps) {
         model={selectedModel}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        language={language}
       />
     </div>
   );

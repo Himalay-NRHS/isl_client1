@@ -1,14 +1,14 @@
 import { Play } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { SignModel } from '../data/models';
-import type { Language } from '../types';
 
 interface ModelCardProps {
   model: SignModel;
-  language: Language;
   onClick: () => void;
 }
 
-export function ModelCard({ model, language, onClick }: ModelCardProps) {
+export function ModelCard({ model, onClick }: ModelCardProps) {
+  const { t } = useLanguage();
   return (
     <div
       onClick={onClick}
@@ -44,7 +44,7 @@ export function ModelCard({ model, language, onClick }: ModelCardProps) {
         </h3>
         
         <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-          {language === 'en' ? model.cleanName : model.gujaratiName}
+          {t(`models.${model.name.toLowerCase().replace(/[^a-z0-9]/g, '')}`) || model.cleanName}
         </p>
         
         {model.description && (
