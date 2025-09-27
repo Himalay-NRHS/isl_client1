@@ -64,7 +64,17 @@ export const kn = {
     error: '3D ಮಾದರಿಯನ್ನು ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ',
     close: 'ಮುಚ್ಚಿ',
     replay: 'ಮತ್ತೆ ಪ್ಲೇ ಮಾಡಿ',
-    category: 'ವರ್ಗ'
+    category: 'ವರ್ಗ',
+    practiceSign: 'ಈ ಸಂಕೇತವನ್ನು ಅಭ್ಯಾಸ ಮಾಡಿ',
+    startPractice: 'ಅಭ್ಯಾಸ ಪ್ರಾರಂಭಿಸಿ',
+    stopPractice: 'ಅಭ್ಯಾಸ ನಿಲ್ಲಿಸಿ',
+    practicing: 'ಅಭ್ಯಾಸ ಮಾಡುತ್ತಿದ್ದೇನೆ...',
+    cameraPermission: 'ಸಂಕೇತ ಅಭ್ಯಾಸಕ್ಕಾಗಿ ಕ್ಯಾಮೆರಾ ಅನುಮತಿ ಅಗತ್ಯ',
+    signCorrect: 'ಅದ್ಭುತ! ನಿಮ್ಮ ಸಂಕೇತ ಸರಿಯಾಗಿದೆ!',
+    signIncorrect: 'ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ - ನಿಮ್ಮ ಕೈಯ ಸ್ಥಾನವನ್ನು ಪರಿಶೀಲಿಸಿ',
+    practiceMode: 'ಅಭ್ಯಾಸ ಮೋಡ್',
+    showMeFirst: 'ಮೊದಲು ನನಗೆ ತೋರಿಸಿ',
+    letMePractice: 'ನನಗೆ ಅಭ್ಯಾಸ ಮಾಡಲು ಬಿಡಿ'
   },
 
   // Common

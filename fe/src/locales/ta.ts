@@ -20,7 +20,7 @@ export const ta = {
     categories: 'வகைகள்',
     interactive: 'ஊடாடும்',
     yourLearningJourney: 'உங்கள் கற்றல் பயணம்',
-    showingResults: '{{total}} இல் {{count}} சைகைகளைக் காட்டுகிறது'
+    showingResults: 'மொத்தம் {{total}} இல் {{count}} சைகைகளைக் காட்டுகிறது'
   },
 
   // Categories
@@ -64,7 +64,17 @@ export const ta = {
     error: '3டி மாதிரியை ஏற்ற முடியவில்லை',
     close: 'மூடு',
     replay: 'மீண்டும் இயக்கு',
-    category: 'வகை'
+    category: 'வகை',
+    practiceSign: 'இந்த சைகையை பழகுங்கள்',
+    startPractice: 'பழகம் துவங்குங்கள்',
+    stopPractice: 'பழகத்தை நிறுத்துங்கள்',
+    practicing: 'பழகம் செய்து கொண்டிருக்கிறது...',
+    cameraPermission: 'சைகை பழகத்திற்கு கேமரா அனுமதி தேவை',
+    signCorrect: 'அருமை! உங்கள் சைகை சரியானது!',
+    signIncorrect: 'மீண்டும் முயற்சிக்கவும் - உங்கள் கை நிலையை சரிபார்க்கவும்',
+    practiceMode: 'பழக முறை',
+    showMeFirst: 'முதலில் எனக்கு காட்டுங்கள்',
+    letMePractice: 'என்னை பழக விடுங்கள்'
   },
 
   // Common
