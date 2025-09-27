@@ -1,57 +1,188 @@
-import { Play, Volume2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
-import { learningModules } from '../data/learningModules';
-import type { Language, LearningModule } from '../types';
+import { Search, Filter } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { ModelCard } from './ModelCard';
+import { ModelModal } from './ModelModal';
+import { signModels, modelCategories, searchModels } from '../data/models';
+import type { Language } from '../types';
+import type { SignModel } from '../data/models';
 
 interface LearnViewProps {
   language: Language;
 }
 
 export function LearnView({ language }: LearnViewProps) {
-  const [selectedModule, setSelectedModule] = useState<LearningModule | null>(null);
-  const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
+  const [selectedModel, setSelectedModel] = useState<SignModel | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  if (selectedModule) {
-    return (
-      <LessonView
-        module={selectedModule}
-        currentLessonIndex={currentLessonIndex}
-        onLessonChange={setCurrentLessonIndex}
-        onBack={() => setSelectedModule(null)}
-        language={language}
-      />
-    );
-  }
+  // Filter models based on search and category
+  const filteredModels = useMemo(() => {
+    let models = signModels;
+    
+    // Apply search filter
+    if (searchQuery) {
+      models = searchModels(searchQuery);
+    }
+    
+    // Apply category filter
+    if (selectedCategory !== 'all') {
+      models = models.filter(model => model.category === selectedCategory);
+    }
+    
+    return models;
+  }, [searchQuery, selectedCategory]);
+
+  // Group models by category for display
+  const modelsByCategory = useMemo(() => {
+    const grouped: { [key: string]: SignModel[] } = {};
+    
+    filteredModels.forEach(model => {
+      if (!grouped[model.category]) {
+        grouped[model.category] = [];
+      }
+      grouped[model.category].push(model);
+    });
+    
+    return grouped;
+  }, [filteredModels]);
+
+  const handleModelClick = (model: SignModel) => {
+    setSelectedModel(model);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedModel(null);
+  };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl mb-6">
-          <span className="text-4xl">👋</span>
+          <span className="text-4xl">🤟</span>
         </div>
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           {language === 'en' ? 'Learn Indian Sign Language (ISL)' : 'ભારતીય સાઇન લેંગ્વેજ (ISL) શીખો'}
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
           {language === 'en' 
-            ? 'Master ISL with interactive lessons, from basic alphabets to daily conversations'
-            : 'મૂળભૂત અક્ષરોથી લઈને દૈનિક વાતચીત સુધી, ઇન્ટરેક્ટિવ પાઠો સાથે ISL માં નિપુણતા મેળવો'
+            ? 'Explore our comprehensive collection of ISL signs. Click on any card to see the 3D demonstration.'
+            : 'ISL સાઇનના અમારા વ્યાપક સંગ્રહનું અન્વેષણ કરો. 3D દર્શન જોવા માટે કોઈપણ કાર્ડ પર ક્લિક કરો.'
           }
         </p>
       </div>
 
-      {/* Learning Modules Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-        {learningModules.map((module) => (
-          <ModuleCard
-            key={module.id}
-            module={module}
-            language={language}
-            onClick={() => setSelectedModule(module)}
+      {/* Filter and Search Section */}
+      <div className="mb-8 space-y-4">
+        {/* Search Bar */}
+        <div className="relative max-w-md mx-auto">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <input
+            type="text"
+            placeholder={language === 'en' ? 'Search signs...' : 'સાઇન શોધો...'}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
           />
-        ))}
+        </div>
+
+        {/* Category Filter */}
+        <div className="flex flex-wrap justify-center gap-2">
+          <button
+            onClick={() => setSelectedCategory('all')}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+              selectedCategory === 'all'
+                ? 'bg-blue-500 text-white shadow-lg'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+            }`}
+          >
+            <Filter className="w-4 h-4 inline mr-2" />
+            {language === 'en' ? 'All Categories' : 'બધી કેટેગરીઓ'}
+          </button>
+          
+          {Object.entries(modelCategories).map(([key, category]) => (
+            <button
+              key={key}
+              onClick={() => setSelectedCategory(key)}
+              className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                selectedCategory === key
+                  ? 'bg-blue-500 text-white shadow-lg'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span className="mr-2">{category.icon}</span>
+              {language === 'en' ? category.name : category.gujaratiName}
+            </button>
+          ))}
+        </div>
       </div>
+
+      {/* Statistics */}
+      <div className="mb-8 text-center">
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          {language === 'en' 
+            ? `Showing ${filteredModels.length} of ${signModels.length} signs`
+            : `${signModels.length} માંથી ${filteredModels.length} સાઇન દર્શાવી રહ્યા છીએ`
+          }
+        </p>
+      </div>
+
+      {/* Models Grid */}
+      {filteredModels.length === 0 ? (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            {language === 'en' ? 'No signs found' : 'કોઈ સાઇન મળ્યા નથી'}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            {language === 'en' 
+              ? 'Try adjusting your search or filter criteria'
+              : 'તમારા શોધ અથવા ફિલ્ટર માપદંડોને સમાયોજિત કરવાનો પ્રયાસ કરો'
+            }
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-12">
+          {Object.entries(modelsByCategory).map(([categoryKey, models]) => (
+            <div key={categoryKey}>
+              {/* Category Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-12 h-12 bg-gradient-to-br ${modelCategories[categoryKey]?.color || 'from-gray-400 to-gray-600'} rounded-xl flex items-center justify-center text-white text-xl`}>
+                    {modelCategories[categoryKey]?.icon || '📝'}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {language === 'en' 
+                        ? modelCategories[categoryKey]?.name || categoryKey
+                        : modelCategories[categoryKey]?.gujaratiName || categoryKey
+                      }
+                    </h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {models.length} {language === 'en' ? 'signs' : 'સાઇન'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Models Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {models.map((model) => (
+                  <ModelCard
+                    key={model.id}
+                    model={model}
+                    language={language}
+                    onClick={() => handleModelClick(model)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Progress Section */}
       <div className="mt-16 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-3xl p-8">
@@ -61,168 +192,34 @@ export function LearnView({ language }: LearnViewProps) {
           </h2>
           <div className="flex justify-center space-x-8">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">0</div>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{signModels.length}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'en' ? 'Lessons Completed' : 'પાઠ પૂર્ણ'}
+                {language === 'en' ? 'Total Signs' : 'કુલ સાઇન'}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400">0</div>
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">{Object.keys(modelCategories).length}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'en' ? 'Signs Learned' : 'સાઇન શીખ્યા'}
+                {language === 'en' ? 'Categories' : 'કેટેગરીઓ'}
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">0</div>
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">3D</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">
-                {language === 'en' ? 'Streak Days' : 'સતત દિવસો'}
+                {language === 'en' ? 'Interactive' : 'ઇન્ટરેક્ટિવ'}
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-}
 
-function ModuleCard({ module, language, onClick }: {
-  module: LearningModule;
-  language: Language;
-  onClick: () => void;
-}) {
-  return (
-    <div
-      onClick={onClick}
-      className="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:-translate-y-1 border border-gray-100 dark:border-gray-700"
-    >
-      <div className="flex items-start space-x-4">
-        <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0">
-          {module.icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-            {module.title}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2">
-            {module.description}
-          </p>
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {module.lessons.length} {language === 'en' ? 'lessons' : 'પાઠ'}
-            </div>
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors duration-200">
-              {language === 'en' ? 'Start Learning' : 'શીખવાનું શરૂ કરો'}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function LessonView({ 
-  module, 
-  currentLessonIndex, 
-  onLessonChange, 
-  onBack, 
-  language 
-}: {
-  module: LearningModule;
-  currentLessonIndex: number;
-  onLessonChange: (index: number) => void;
-  onBack: () => void;
-  language: Language;
-}) {
-  const lesson = module.lessons[currentLessonIndex];
-  const isFirstLesson = currentLessonIndex === 0;
-  const isLastLesson = currentLessonIndex === module.lessons.length - 1;
-
-  return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <button
-          onClick={onBack}
-          className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
-        >
-          <ChevronLeft className="w-5 h-5" />
-          <span>{language === 'en' ? 'Back to Modules' : 'મોડ્યુલ પર પાછા'}</span>
-        </button>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          {currentLessonIndex + 1} / {module.lessons.length}
-        </div>
-      </div>
-
-      {/* Lesson Content */}
-      <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 transition-colors duration-200">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            {lesson.title}
-          </h1>
-          <div className="flex items-center justify-center space-x-4 text-lg">
-            <span className="text-gray-900 dark:text-white font-medium">
-              {lesson.meaning.en}
-            </span>
-            <span className="text-gray-400">•</span>
-            <span className="text-gray-600 dark:text-gray-400">
-              {lesson.meaning.gu}
-            </span>
-          </div>
-        </div>
-
-        {/* Video/Sign Display */}
-        <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl aspect-video mb-8 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-6xl mb-4">🎥</div>
-            <p className="text-gray-500 dark:text-gray-400 mb-4">
-              {language === 'en' ? 'Sign video placeholder' : 'સાઇન વિડિયો પ્લેસહોલ્ડર'}
-            </p>
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200 flex items-center space-x-2 mx-auto">
-              <Play className="w-5 h-5" />
-              <span>{language === 'en' ? 'Play Video' : 'વિડિયો ચલાવો'}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Audio Button */}
-        {lesson.audioUrl && (
-          <div className="text-center mb-8">
-            <button className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200 flex items-center space-x-2 mx-auto">
-              <Volume2 className="w-5 h-5" />
-              <span>{language === 'en' ? 'Play Pronunciation' : 'ઉચ્ચાર સાંભળો'}</span>
-            </button>
-          </div>
-        )}
-
-        {/* Navigation */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => onLessonChange(currentLessonIndex - 1)}
-            disabled={isFirstLesson}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-colors duration-200 ${
-              isFirstLesson
-                ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600'
-            }`}
-          >
-            <ChevronLeft className="w-5 h-5" />
-            <span>{language === 'en' ? 'Previous' : 'પાછળ'}</span>
-          </button>
-
-          <button
-            onClick={() => onLessonChange(currentLessonIndex + 1)}
-            disabled={isLastLesson}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-colors duration-200 ${
-              isLastLesson
-                ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
-          >
-            <span>{language === 'en' ? 'Next' : 'આગળ'}</span>
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+      {/* Modal */}
+      <ModelModal
+        model={selectedModel}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        language={language}
+      />
     </div>
   );
 }
