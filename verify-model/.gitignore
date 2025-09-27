@@ -1,0 +1,44 @@
+# Python virtual environments
+venv_311/
+venv_*/
+venv/
+env/
+.venv/
+.env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# System files
+.DS_Store
+._*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Model and data files
+*.h5
+*.pkl
+*.pt
+*.pth
+models/
+data/
+images/
+videos/
+datasets/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Environment variables
+.env
+.env.local
