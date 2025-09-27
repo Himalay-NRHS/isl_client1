@@ -17,7 +17,7 @@ interface AnimatedModelProps {
 // Preload models
 useGLTF.preload("/models/child.glb");
 useGLTF.preload("/models/cat.glb");
-useGLTF.preload("/models/sorry.glb");
+useGLTF.preload("/models/birds.glb");
 
 function AnimatedModel({ url, visible, onFinished }: AnimatedModelProps) {
   const group = useRef<THREE.Group>(null!);
@@ -98,7 +98,7 @@ export default function GLBViewer({ words = '', onAnimationComplete }: GLBViewer
   const [models, setModels] = useState<string[]>([
     '/models/child.glb', 
     '/models/cat.glb', 
-    '/models/sorry.glb'
+    '/models/birds.glb'
   ]);
 
   useEffect(() => {
@@ -113,7 +113,7 @@ export default function GLBViewer({ words = '', onAnimationComplete }: GLBViewer
       setTimeout(() => setIsLoading(false), 800);
     } else {
       setIsLoading(true);
-      setModels(['/models/child.glb', '/models/cat.glb', '/models/sorry.glb']);
+      setModels(['/models/child.glb', '/models/cat.glb', '/models/birds.glb']);
       setCurrentModelIndex(0);
       setIsAnimating(false);
       setTimeout(() => setIsLoading(false), 500);
