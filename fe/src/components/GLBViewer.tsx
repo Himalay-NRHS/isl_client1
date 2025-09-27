@@ -19,9 +19,24 @@ useGLTF.preload("/models/child.glb");
 useGLTF.preload("/models/cat.glb");
 useGLTF.preload("/models/birds.glb");
 
+// Explicitly preload the fallback model
+useGLTF.preload("/models/good.glb");
+
 function AnimatedModel({ url, visible, onFinished }: AnimatedModelProps) {
   const group = useRef<THREE.Group>(null!);
-  const { scene, animations } = useGLTF(url);
+  const [modelLoadError, setModelLoadError] = useState(false);
+  
+  // Try to load the model, with error handling
+  let modelData;
+  try {
+    modelData = useGLTF(modelLoadError ? '/models/good.glb' : url);
+  } catch (error) {
+    console.error(`Error loading model ${url}, falling back to good.glb`, error);
+    setModelLoadError(true);
+    modelData = useGLTF('/models/good.glb');
+  }
+  
+  const { scene, animations } = modelData;
   const { actions, mixer } = useAnimations(animations, group);
 
   useEffect(() => {

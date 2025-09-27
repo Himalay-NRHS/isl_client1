@@ -49,31 +49,36 @@ app.post("/translate", async (req, res) => {
     const prompt = `
       Convert this English sentence: "${text}" 
       into a sequence of simple Indian Sign Language (ISL) words.
-      Only use these available words: cat, child, sorry, dog, father, birds, girl, good, hard, hot, old, school, student, friend, share, score.
-      Return ONLY the words separated by spaces. For example: "cat child sorry".
-      Keep it simple and use only 3-5 words maximum.
+      Only use these available words: cat, child, sorry, dog, father, birds, girl, good, hard, hot, old, school, student, friend, share, score, chair, collect, depth, go.
+      Return ONLY the words separated by spaces, with no punctuation or additional text.
+      Use as many words as needed to convey the meaning accurately.
     `;
 
     const geminiResponse = await generateContentWithGemini(prompt);
 
     const availableWords = [
-      "cat",
-      "child",
-      "sorry",
-      "dog",
-      "father",
-      "birds",
-      "girl",
-      "good",
-      "hard",
-      "hot",
-      "old",
-      "school",
-      "student",
-      "friend",
-      "share",
-      "score",
-    ];
+  "birds",
+  "cat",
+  "chair",
+  "child",
+  "collect",
+  "depth",
+  "dog",
+  "father",
+  "friend",
+  "girl",
+  "go",
+  "good",
+  "hard",
+  "hot",
+  "old",
+  "school",
+  "score",
+  "share",
+  "sorry",
+  "student",
+];
+
 
     const wordsArray = geminiResponse.toLowerCase().split(/\s+/);
     const validWords = wordsArray

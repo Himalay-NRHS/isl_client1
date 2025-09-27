@@ -96,6 +96,7 @@ function TextToSignMode() {
   const [inputText, setInputText] = useState('');
   const [wordsToAnimate, setWordsToAnimate] = useState('');
   const [isConverting, setIsConverting] = useState(false);
+  const [fullApiResponse, setFullApiResponse] = useState('');
 
   const handleConvert = async () => {
     if (!inputText.trim()) return;
@@ -117,13 +118,21 @@ function TextToSignMode() {
       const data = await response.json();
       console.log('Received translation:', data);
       
-      // Set the words to animate based on the API response
+      // Set the words to animate and store full API response
       if (data && data.translation) {
         setWordsToAnimate(data.translation);
         console.log('Models to animate:', data.translation.split(' ').map((word: string) => `${word}.glb`));
+        
+        // Store the full API response if available
+        if (data.fullGeminiResponse) {
+          setFullApiResponse(data.fullGeminiResponse);
+        } else {
+          setFullApiResponse('(API response format did not include full text)');
+        }
       } else {
         console.error('Translation response missing expected format:', data);
         alert('Unexpected response format from translation service');
+        setFullApiResponse('');
       }
       
     } catch (error) {
@@ -180,6 +189,31 @@ function TextToSignMode() {
             onAnimationComplete={handleAnimationComplete}
           />
         </div>
+        
+        {/* Display selected words */}
+        {wordsToAnimate && (
+          <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+            <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Selected Sign Words:</h4>
+            <div className="flex flex-wrap gap-2">
+              {wordsToAnimate.split(' ').map((word, index) => (
+                <span 
+                  key={index} 
+                  className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 px-2 py-1 rounded text-sm"
+                >
+                  {word}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Display full API response */}
+        {fullApiResponse && (
+          <div className="mt-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+            <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-1">Full AI Response:</h4>
+            <p className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-wrap">{fullApiResponse}</p>
+          </div>
+        )}
       </div>
 
       {/* Convert Button */}
