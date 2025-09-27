@@ -96,6 +96,7 @@ function TextToSignMode() {
   const [inputText, setInputText] = useState('');
   const [wordsToAnimate, setWordsToAnimate] = useState('');
   const [isConverting, setIsConverting] = useState(false);
+  const [fullApiResponse, setFullApiResponse] = useState('');
 
   const handleConvert = async () => {
     if (!inputText.trim()) return;
@@ -103,23 +104,40 @@ function TextToSignMode() {
     setIsConverting(true);
     
     try {
-      // Here you would typically call your backend API
-      // For now, we'll simulate the backend response
-      // const response = await fetch('/api/text-to-sign', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ text: inputText })
-      // });
-      // const data = await response.json();
+      // Call the backend API to translate text to sign words
+      const response = await fetch('http://localhost:3001/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: inputText })
+      });
       
-      // Simulate backend processing delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
+      }
       
-      // Simulate backend response - in real implementation, this would come from your API
-      setWordsToAnimate(inputText.toLowerCase().trim());
+      const data = await response.json();
+      console.log('Received translation:', data);
+      
+      // Set the words to animate and store full API response
+      if (data && data.translation) {
+        setWordsToAnimate(data.translation);
+        console.log('Models to animate:', data.translation.split(' ').map((word: string) => `${word}.glb`));
+        
+        // Store the full API response if available
+        if (data.fullGeminiResponse) {
+          setFullApiResponse(data.fullGeminiResponse);
+        } else {
+          setFullApiResponse('(API response format did not include full text)');
+        }
+      } else {
+        console.error('Translation response missing expected format:', data);
+        alert('Unexpected response format from translation service');
+        setFullApiResponse('');
+      }
       
     } catch (error) {
       console.error('Conversion failed:', error);
+      alert('Failed to convert text. Please try again.');
     } finally {
       setIsConverting(false);
     }
@@ -171,6 +189,31 @@ function TextToSignMode() {
             onAnimationComplete={handleAnimationComplete}
           />
         </div>
+        
+        {/* Display selected words */}
+        {wordsToAnimate && (
+          <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+            <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Selected Sign Words:</h4>
+            <div className="flex flex-wrap gap-2">
+              {wordsToAnimate.split(' ').map((word, index) => (
+                <span 
+                  key={index} 
+                  className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 px-2 py-1 rounded text-sm"
+                >
+                  {word}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Display full API response */}
+        {fullApiResponse && (
+          <div className="mt-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+            <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-1">Full AI Response:</h4>
+            <p className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-wrap">{fullApiResponse}</p>
+          </div>
+        )}
       </div>
 
       {/* Convert Button */}

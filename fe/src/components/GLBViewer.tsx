@@ -17,11 +17,26 @@ interface AnimatedModelProps {
 // Preload models
 useGLTF.preload("/models/child.glb");
 useGLTF.preload("/models/cat.glb");
-useGLTF.preload("/models/sorry.glb");
+useGLTF.preload("/models/birds.glb");
+
+// Explicitly preload the fallback model
+useGLTF.preload("/models/good.glb");
 
 function AnimatedModel({ url, visible, onFinished }: AnimatedModelProps) {
   const group = useRef<THREE.Group>(null!);
-  const { scene, animations } = useGLTF(url);
+  const [modelLoadError, setModelLoadError] = useState(false);
+  
+  // Try to load the model, with error handling
+  let modelData;
+  try {
+    modelData = useGLTF(modelLoadError ? '/models/good.glb' : url);
+  } catch (error) {
+    console.error(`Error loading model ${url}, falling back to good.glb`, error);
+    setModelLoadError(true);
+    modelData = useGLTF('/models/good.glb');
+  }
+  
+  const { scene, animations } = modelData;
   const { actions, mixer } = useAnimations(animations, group);
 
   useEffect(() => {
@@ -95,11 +110,7 @@ export default function GLBViewer({ words = '', onAnimationComplete }: GLBViewer
   const [currentModelIndex, setCurrentModelIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [models, setModels] = useState<string[]>([
-    '/models/child.glb', 
-    '/models/cat.glb', 
-    '/models/sorry.glb'
-  ]);
+  const [models, setModels] = useState<string[]>([]);
 
   useEffect(() => {
     if (words.trim()) {
@@ -112,23 +123,22 @@ export default function GLBViewer({ words = '', onAnimationComplete }: GLBViewer
       // Simulate loading time for models
       setTimeout(() => setIsLoading(false), 800);
     } else {
-      setIsLoading(true);
-      setModels(['/models/child.glb', '/models/cat.glb', '/models/sorry.glb']);
+      // Clear models when no words provided
+      setModels([]);
       setCurrentModelIndex(0);
       setIsAnimating(false);
-      setTimeout(() => setIsLoading(false), 500);
     }
   }, [words]);
 
   useEffect(() => {
-    if (models.length > 0 && !isAnimating && currentModelIndex === 0) {
+    if (models.length > 0 && !isAnimating && currentModelIndex === 0 && words.trim()) {
       const timer = setTimeout(() => {
         setCurrentModelIndex(0);
         setIsAnimating(true);
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [models]);
+  }, [models, words]);
 
   const handleFinished = () => {
     if (currentModelIndex < models.length - 1) {
@@ -158,69 +168,92 @@ export default function GLBViewer({ words = '', onAnimationComplete }: GLBViewer
       <div className="w-full flex-grow min-h-[300px] rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-700 relative">
         {isLoading && <LoadingSpinner />}
         
-        <Canvas style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} shadows camera={{ position: [0, 0.7, 1.8], fov: 40 }}>
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[3, 5, 5]} intensity={1.2} castShadow />
-          <pointLight position={[-2, 2, -2]} intensity={0.5} />
-          <hemisphereLight intensity={0.4} groundColor="black" />
+        {models.length === 0 ? (
+          // Display placeholder when no models are available
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="text-center p-6">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-16 w-16 mx-auto mb-4 text-gray-400 dark:text-gray-600" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Enter text and press Convert</h3>
+              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                ISL signs will be displayed here after you submit your text.
+              </p>
+            </div>
+          </div>
+        ) : (
+          // Display 3D model canvas when models are available
+          <Canvas style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} shadows camera={{ position: [0, 0.7, 1.8], fov: 40 }}>
+            <ambientLight intensity={0.8} />
+            <directionalLight position={[3, 5, 5]} intensity={1.2} castShadow />
+            <pointLight position={[-2, 2, -2]} intensity={0.5} />
+            <hemisphereLight intensity={0.4} groundColor="black" />
 
-          <Suspense fallback={null}>
-            {models.map((modelUrl, i) => (
-              <AnimatedModel
-                key={modelUrl}
-                url={modelUrl}
-                visible={i === currentModelIndex && isAnimating && !isLoading}
-                onFinished={handleFinished}
-              />
-            ))}
-          </Suspense>
+            <Suspense fallback={null}>
+              {models.map((modelUrl, i) => (
+                <AnimatedModel
+                  key={modelUrl}
+                  url={modelUrl}
+                  visible={i === currentModelIndex && isAnimating && !isLoading}
+                  onFinished={handleFinished}
+                />
+              ))}
+            </Suspense>
 
-          <OrbitControls 
-            enablePan={false}
-            enableZoom={true}
-            enableRotate={true}
-            maxPolarAngle={Math.PI / 2}
-            minDistance={1.5}
-            maxDistance={4}
-            target={[0, 0.4, 0]} // Focus on upper body/face area
-            makeDefault
-          />
-        </Canvas>
+            <OrbitControls 
+              enablePan={false}
+              enableZoom={true}
+              enableRotate={true}
+              maxPolarAngle={Math.PI / 2}
+              minDistance={1.5}
+              maxDistance={4}
+              target={[0, 0.4, 0]} // Focus on upper body/face area
+              makeDefault
+            />
+          </Canvas>
+        )}
       </div>
       
-      <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-        <div className="bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
-          {isLoading ? (
-            <span>Loading models...</span>
-          ) : models.length > 0 ? (
-            <span>
-              {currentModelIndex + 1} / {models.length}
-              {isAnimating && (
-                <span> - Playing: {models[currentModelIndex]?.split('/').pop()?.replace('.glb', '')}</span>
-              )}
-            </span>
-          ) : (
-            <span>No models to display</span>
-          )}
+      {/* Only show controls when models are available */}
+      {models.length > 0 && (
+        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
+          <div className="bg-black bg-opacity-50 text-white px-3 py-1 rounded-lg text-sm">
+            {isLoading ? (
+              <span>Loading models...</span>
+            ) : (
+              <span>
+                {currentModelIndex + 1} / {models.length}
+                {isAnimating && (
+                  <span> - Playing: {models[currentModelIndex]?.split('/').pop()?.replace('.glb', '')}</span>
+                )}
+              </span>
+            )}
+          </div>
+          
+          <div className="flex space-x-2">
+            <button
+              onClick={startAnimation}
+              disabled={isAnimating || isLoading}
+              className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+            >
+              {isLoading ? 'Loading...' : isAnimating ? 'Playing...' : 'Play Sequence'}
+            </button>
+            <button
+              onClick={restartAnimation}
+              disabled={isLoading}
+              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+            >
+              Restart
+            </button>
+          </div>
         </div>
-        
-        <div className="flex space-x-2">
-          <button
-            onClick={startAnimation}
-            disabled={isAnimating || models.length === 0 || isLoading}
-            className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
-          >
-            {isLoading ? 'Loading...' : isAnimating ? 'Playing...' : 'Play Sequence'}
-          </button>
-          <button
-            onClick={restartAnimation}
-            disabled={models.length === 0 || isLoading}
-            className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
-          >
-            Restart
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
