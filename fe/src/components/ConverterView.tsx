@@ -165,7 +165,7 @@ function TextToSignMode({ language }: { language: Language }) {
         <textarea
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder={language === 'en' ? 'Type your message here... (e.g., "cat child sorry")' : 'તમારો સંદેશ અહીં ટાઇપ કરો... (દા.ત., "cat child sorry")'}
+          placeholder={language === 'en' ? 'Type your message here...' : 'તમારો સંદેશ અહીં ટાઇપ કરો...'}
           className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors duration-200"
         />
       </div>
@@ -175,43 +175,16 @@ function TextToSignMode({ language }: { language: Language }) {
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
           {language === 'en' ? 'ISL Signs:' : 'ISL સાઇન્સ:'}
         </h3>
-        <div className="min-h-[400px] bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
-          {wordsToAnimate ? (
-            <GLBViewer 
-              words={wordsToAnimate} 
-              onAnimationComplete={handleAnimationComplete}
-            />
-          ) : (
-            <div className="h-full flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600">
-              <p className="text-gray-500 dark:text-gray-400 italic text-center">
-                {language === 'en' 
-                  ? 'Sign animations will appear here...'
-                  : 'સાઇન એનિમેશન અહીં દેખાશે...'
-                }
-              </p>
-            </div>
-          )}
+        <div className="h-[400px] bg-white dark:bg-gray-800 rounded-xl overflow-hidden">
+          <GLBViewer 
+            words={wordsToAnimate} 
+            onAnimationComplete={handleAnimationComplete}
+          />
         </div>
       </div>
 
       {/* Convert Button */}
-      <div className="text-center space-y-4">
-        {/* Demo Button */}
-        <div className="mb-4">
-          <button 
-            onClick={() => setInputText('cat child sorry')}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200 mr-4"
-          >
-            {language === 'en' ? 'Try Demo' : 'ડેમો કરો'}
-          </button>
-          <button 
-            onClick={() => setInputText('good father student')}
-            className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-xl font-medium transition-colors duration-200"
-          >
-            {language === 'en' ? 'Another Demo' : 'બીજો ડેમો'}
-          </button>
-        </div>
-        
+      <div className="text-center">
         <button 
           onClick={handleConvert}
           disabled={!inputText.trim() || isConverting}

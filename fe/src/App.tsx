@@ -8,7 +8,7 @@ import './App.css'
 
 function App() {
   const [currentView, setCurrentView] = useState<'converter' | 'learn'>('converter')
-  const [mode, setMode] = useState<Mode>('sign-to-text')
+  const [mode, setMode] = useState<Mode>('text-to-sign')
   const [language, setLanguage] = useState<Language>('en')
 
   return (
