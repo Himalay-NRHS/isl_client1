@@ -64,7 +64,17 @@ export const gu = {
     error: '3D મોડેલ લોડ કરવામાં અસફળ',
     close: 'બંધ કરો',
     replay: 'ફરીથી ચલાવો',
-    category: 'કેટેગરી'
+    category: 'કેટેગરી',
+    practiceSign: 'આ સાઇનનો અભ્યાસ કરો',
+    startPractice: 'અભ્યાસ શરૂ કરો',
+    stopPractice: 'અભ્યાસ બંધ કરો',
+    practicing: 'અભ્યાસ ચાલુ છે...',
+    cameraPermission: 'સાઇન અભ્યાસ માટે કેમેરાની અનુમતિ જરૂરી',
+    signCorrect: 'વાહ! તમારું સાઇન સાચું છે!',
+    signIncorrect: 'ફરી કોશિશ કરો - તમારા હાથની સ્થિતિ જોઓ',
+    practiceMode: 'અભ્યાસ મોડ',
+    showMeFirst: 'પહેલા મને દર્શાવો',
+    letMePractice: 'મને અભ્યાસ કરવા દો'
   },
 
   // Common

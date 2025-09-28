@@ -64,7 +64,17 @@ export const hi = {
     error: '3डी मॉडल लोड करने में विफल',
     close: 'बंद करें',
     replay: 'दोबारा चलाएं',
-    category: 'श्रेणी'
+    category: 'श्रेणी',
+    practiceSign: 'इस साइन का अभ्यास करें',
+    startPractice: 'अभ्यास शुरू करें',
+    stopPractice: 'अभ्यास बंद करें',
+    practicing: 'अभ्यास हो रहा है...',
+    cameraPermission: 'साइन अभ्यास के लिए कैमरा अनुमति चाहिए',
+    signCorrect: 'बहुत बढ़िया! आपका साइन सही है!',
+    signIncorrect: 'फिर से कोशिश करें - अपने हाथ की स्थिति जांचें',
+    practiceMode: 'अभ्यास मोड',
+    showMeFirst: 'पहले मुझे दिखाएं',
+    letMePractice: 'मुझे अभ्यास करने दें'
   },
 
   // Common

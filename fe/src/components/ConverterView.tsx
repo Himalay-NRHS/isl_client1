@@ -1,7 +1,15 @@
-import { Camera, Type, Hand, Mic, Play } from 'lucide-react';
-import { useState } from 'react';
+import { Camera, Type, Hand, Mic, Play, MicOff } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import GLBViewer from './GLBViewer';
 import type { Mode } from '../types';
+
+// Extend the Window interface to include speech recognition
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
 
 interface ConverterViewProps {
   mode: Mode;
@@ -98,6 +106,53 @@ function TextToSignMode() {
   const [isConverting, setIsConverting] = useState(false);
   const [fullApiResponse, setFullApiResponse] = useState('');
   const [conversionError, setConversionError] = useState<string | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speechRecognition, setSpeechRecognition] = useState<any>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+      
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInputText(prev => prev + (prev ? ' ' : '') + transcript);
+      };
+      
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+      
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+      
+      setSpeechRecognition(recognition);
+    }
+  }, []);
+
+  const toggleSpeechRecognition = () => {
+    if (!speechRecognition) {
+      alert('Speech recognition is not supported in your browser');
+      return;
+    }
+
+    if (isListening) {
+      speechRecognition.stop();
+    } else {
+      speechRecognition.start();
+    }
+  };
 
   const handleConvert = async () => {
     if (!inputText.trim()) return;
@@ -169,16 +224,29 @@ function TextToSignMode() {
             Enter Text:
           </h3>
           <div className="flex space-x-2">
-            <button className="p-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors duration-200">
-              <Mic className="w-5 h-5" />
+            <button 
+              onClick={toggleSpeechRecognition}
+              disabled={!speechRecognition}
+              className={`p-2 text-white rounded-xl transition-colors duration-200 ${
+                isListening 
+                  ? 'bg-red-500 hover:bg-red-600 animate-pulse' 
+                  : 'bg-orange-500 hover:bg-orange-600'
+              } ${!speechRecognition ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title={isListening ? 'Stop listening' : 'Start voice input'}
+            >
+              {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </button>
           </div>
         </div>
         <textarea
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          placeholder="Type your message here..."
-          className="w-full h-32 p-4 border border-gray-300 dark:border-gray-600 rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-colors duration-200"
+          placeholder={isListening ? "🎤 Listening... Speak now!" : "Type your message here or click the microphone to speak..."}
+          className={`w-full h-32 p-4 border rounded-2xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-all duration-200 ${
+            isListening 
+              ? 'border-red-400 ring-2 ring-red-200 dark:border-red-500 dark:ring-red-800' 
+              : 'border-gray-300 dark:border-gray-600'
+          }`}
         />
       </div>
 

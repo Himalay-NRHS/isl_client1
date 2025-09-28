@@ -54,6 +54,28 @@ export function LearnView() {
     setSelectedModel(null);
   };
 
+  const handleStartPractice = async () => {
+    try {
+      // Call backend to start the OpenCV model
+      const response = await fetch('http://localhost:3001/api/start-practice', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        // Show success message or notification
+        alert('OpenCV Practice Mode Started! Check your camera for the ISL detection window.');
+      } else {
+        alert('Failed to start practice mode. Make sure the backend server is running.');
+      }
+    } catch (error) {
+      console.error('Error starting practice mode:', error);
+      alert('Failed to connect to the server. Make sure both frontend and backend are running.');
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Hero Section */}
@@ -64,9 +86,18 @@ export function LearnView() {
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
           {t('learn.title')}
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-6">
           {t('learn.subtitle')}
         </p>
+        
+        {/* Global Practice Button */}
+        <button
+          onClick={handleStartPractice}
+          className="inline-flex items-center space-x-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+        >
+          <span className="text-2xl">📹</span>
+          <span>Start Practice Mode</span>
+        </button>
       </div>
 
       {/* Filter and Search Section */}

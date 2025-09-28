@@ -3,6 +3,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const { GoogleGenAI } = require("@google/genai");
+const { spawn } = require('child_process');
 
 dotenv.config();
 
@@ -15,7 +16,8 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' })); // Increase limit for base64 images
+app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 // Helper function to call Gemini API
 async function generateContentWithGemini(prompt) {
@@ -102,6 +104,80 @@ app.post("/translate", async (req, res) => {
   }
 });
 
+// Start practice mode endpoint - launches OpenCV detection directly
+app.post('/api/start-practice', async (req, res) => {
+  try {
+    console.log('Starting OpenCV ISL Practice Mode...');
+    
+    const pythonScript = '../verify-model/ISLmodel/stable_isl_detection.py';
+    const pythonPath = '../verify-model/venv_311/bin/python';
+    
+    // Launch the OpenCV detection in background
+    const pythonProcess = spawn(pythonPath, [pythonScript], {
+      cwd: __dirname,
+      detached: true,
+      stdio: 'inherit'
+    });
+    
+    // Don't wait for the process to finish - let it run independently
+    pythonProcess.unref();
+    
+    res.json({
+      success: true,
+      message: 'OpenCV ISL Practice Mode started! Check your camera.',
+      pid: pythonProcess.pid
+    });
+    
+  } catch (error) {
+    console.error('Error starting practice mode:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to start OpenCV practice mode',
+      message: error.message
+    });
+  }
+});
+
+// Helper function to call Python verification script (kept for future use)
+function callPythonVerification(base64Image, expectedSign) {
+  return new Promise((resolve, reject) => {
+    const pythonScript = '../verify-model/api_isl_detection.py';
+    const pythonPath = '../verify-model/venv_311/bin/python';
+    const pythonProcess = spawn(pythonPath, [pythonScript, base64Image, expectedSign], {
+      cwd: __dirname
+    });
+    
+    let result = '';
+    let error = '';
+    
+    pythonProcess.stdout.on('data', (data) => {
+      result += data.toString();
+    });
+    
+    pythonProcess.stderr.on('data', (data) => {
+      error += data.toString();
+    });
+    
+    pythonProcess.on('close', (code) => {
+      if (code === 0) {
+        try {
+          const parsedResult = JSON.parse(result.trim());
+          resolve(parsedResult);
+        } catch (parseError) {
+          reject(new Error(`Failed to parse Python script output: ${result}`));
+        }
+      } else {
+        reject(new Error(`Python script failed with code ${code}: ${error}`));
+      }
+    });
+    
+    // Set a timeout for the Python process
+    setTimeout(() => {
+      pythonProcess.kill();
+      reject(new Error('Python script timeout'));
+    }, 10000); // 10 second timeout
+  });
+}
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`POST endpoint: http://localhost:${PORT}/translate`);

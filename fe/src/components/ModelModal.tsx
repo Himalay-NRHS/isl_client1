@@ -119,7 +119,7 @@ export function ModelModal({ model, isOpen, onClose }: ModelModalProps) {
             
             {/* Audio button placeholder - can be implemented later */}
             <button
-              className="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200"
+              className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200"
               disabled
             >
               <Volume2 className="w-5 h-5" />

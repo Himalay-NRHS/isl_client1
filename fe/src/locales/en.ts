@@ -64,7 +64,17 @@ export const en = {
     error: 'Failed to load 3D model',
     close: 'Close',
     replay: 'Replay',
-    category: 'Category'
+    category: 'Category',
+    practiceSign: 'Practice This Sign',
+    startPractice: 'Start Practice',
+    stopPractice: 'Stop Practice',
+    practicing: 'Practicing...',
+    cameraPermission: 'Camera permission required to practice signs',
+    signCorrect: 'Great! Your sign is correct!',
+    signIncorrect: 'Try again - check your hand position',
+    practiceMode: 'Practice Mode',
+    showMeFirst: 'Show me first',
+    letMePractice: 'Let me practice'
   },
 
   // Common
