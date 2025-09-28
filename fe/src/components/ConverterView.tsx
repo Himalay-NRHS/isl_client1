@@ -97,11 +97,15 @@ function TextToSignMode() {
   const [wordsToAnimate, setWordsToAnimate] = useState('');
   const [isConverting, setIsConverting] = useState(false);
   const [fullApiResponse, setFullApiResponse] = useState('');
+  const [conversionError, setConversionError] = useState<string | null>(null);
 
   const handleConvert = async () => {
     if (!inputText.trim()) return;
     
     setIsConverting(true);
+    setConversionError(null);
+    setWordsToAnimate('');
+    setFullApiResponse('');
     
     try {
       // Call the backend API to translate text to sign words
@@ -131,13 +135,13 @@ function TextToSignMode() {
         }
       } else {
         console.error('Translation response missing expected format:', data);
-        alert('Unexpected response format from translation service');
-        setFullApiResponse('');
+        setConversionError('Unexpected response format from translation service');
+        setFullApiResponse(JSON.stringify(data, null, 2));
       }
       
     } catch (error) {
       console.error('Conversion failed:', error);
-      alert('Failed to convert text. Please try again.');
+      setConversionError(`Conversion failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsConverting(false);
     }
@@ -190,28 +194,64 @@ function TextToSignMode() {
           />
         </div>
         
-        {/* Display selected words */}
-        {wordsToAnimate && (
-          <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
-            <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">Selected Sign Words:</h4>
-            <div className="flex flex-wrap gap-2">
-              {wordsToAnimate.split(' ').map((word, index) => (
-                <span 
-                  key={index} 
-                  className="bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100 px-2 py-1 rounded text-sm"
-                >
-                  {word}
-                </span>
-              ))}
+        {/* Error message display */}
+        {conversionError && (
+          <div className="mt-4 bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
+            <div className="flex items-start">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 mr-2" 
+                viewBox="0 0 20 20" 
+                fill="currentColor"
+              >
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              <div>
+                <h4 className="font-medium text-red-800 dark:text-red-300">Translation Failed</h4>
+                <p className="mt-1 text-red-700 dark:text-red-300 text-sm">{conversionError}</p>
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400">Try again with a different phrase or check the server connection.</p>
+              </div>
             </div>
           </div>
         )}
-        
-        {/* Display full API response */}
-        {fullApiResponse && (
-          <div className="mt-4 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-            <h4 className="font-medium text-gray-700 dark:text-gray-300 mb-1">Full AI Response:</h4>
-            <p className="text-gray-600 dark:text-gray-400 text-sm whitespace-pre-wrap">{fullApiResponse}</p>
+
+        {/* Translation Results Section */}
+        {wordsToAnimate && (
+          <div className="mt-4 space-y-3">
+            {/* Sign Words Display */}
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2">Selected Sign Words:</h4>
+              <div className="flex flex-wrap gap-2">
+                {wordsToAnimate.split(' ').map((word, index) => (
+                  <span 
+                    key={index} 
+                    className="px-3 py-1.5 bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200 rounded-md text-sm font-medium"
+                  >
+                    {word}
+                  </span>
+                ))}
+              </div>
+              
+              {/* Original Text */}
+              <div className="mt-3 pt-3 border-t border-blue-200 dark:border-blue-800/50">
+                <h5 className="text-sm font-medium text-blue-700 dark:text-blue-400 mb-1">Original Text:</h5>
+                <p className="text-blue-600 dark:text-blue-300 text-sm">{inputText}</p>
+              </div>
+            </div>
+            
+            {/* Collapsible API Response */}
+            {fullApiResponse && (
+              <details className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <summary className="font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                  Show AI Response Details
+                </summary>
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <pre className="whitespace-pre-wrap text-sm text-gray-600 dark:text-gray-400 p-2 bg-gray-100 dark:bg-gray-800/80 rounded overflow-auto max-h-40">
+                    {fullApiResponse}
+                  </pre>
+                </div>
+              </details>
+            )}
           </div>
         )}
       </div>
