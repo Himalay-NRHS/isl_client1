@@ -136,23 +136,4 @@ npm run dev
 2. Browse through available learning modules
 3. Watch sign demonstrations and practice
 
-## Future Enhancements
-
-- Integration of computer vision for sign detection and interpretation
-- Expanded sign vocabulary beyond the current set
-- Mobile application for on-the-go translation
-- Offline functionality for use without internet connection
-- Enhanced ISL grammar engine for more natural translations
-- Community contribution platform for adding new signs
-
-## Contributors
-
-- Team SilenceSpeaks
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-*This project was developed for the Smart India Hackathon (SIH) 2024.*
+*This project was developed for the Smart India Hackathon (SIH) 2025.*
