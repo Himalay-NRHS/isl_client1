@@ -1,6 +1,7 @@
-import { Camera, Type, Hand, Mic, Play, MicOff } from 'lucide-react';
+import { Type, Hand, Mic, MicOff } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import GLBViewer from './GLBViewer';
+import { VideoAnalyzer } from './VideoAnalyzer';
 import type { Mode } from '../types';
 
 // Extend the Window interface to include speech recognition
@@ -50,51 +51,10 @@ export function ConverterView({ mode, onModeChange }: ConverterViewProps) {
       {/* Main Content Card */}
       <div className="bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-8 transition-colors duration-200">
         {mode === 'sign-to-text' ? (
-          <SignToTextMode />
+          <VideoAnalyzer />
         ) : (
           <TextToSignMode />
         )}
-      </div>
-    </div>
-  );
-}
-
-function SignToTextMode() {
-  return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-          Sign to Text Converter
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400">
-          Show your signs to the camera and we'll convert them to text
-        </p>
-      </div>
-
-      {/* Camera View */}
-      <div className="relative bg-gray-100 dark:bg-gray-700 rounded-2xl aspect-video flex items-center justify-center">
-        <div className="text-center">
-          <Camera className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 mb-4">
-            Camera not active
-          </p>
-          <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200 flex items-center space-x-2 mx-auto">
-            <Play className="w-5 h-5" />
-            <span>Start Camera</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Output Text */}
-      <div className="bg-gray-50 dark:bg-gray-900 rounded-2xl p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-          Detected Text:
-        </h3>
-        <div className="min-h-[100px] bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-dashed border-gray-300 dark:border-gray-600">
-          <p className="text-gray-500 dark:text-gray-400 italic">
-            Translated text will appear here...
-          </p>
-        </div>
       </div>
     </div>
   );
@@ -288,16 +248,16 @@ function TextToSignMode() {
           <div className="mt-4 space-y-3">
             {/* Sign Words Display */}
             <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2">Selected Sign Words:</h4>
+              <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-2"></h4>
               <div className="flex flex-wrap gap-2">
-                {wordsToAnimate.split(' ').map((word, index) => (
+                {/* {wordsToAnimate.split(' ').map((word, index) => (
                   <span 
                     key={index} 
                     className="px-3 py-1.5 bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200 rounded-md text-sm font-medium"
                   >
                     {word}
                   </span>
-                ))}
+                ))} */}
               </div>
               
               {/* Original Text */}
@@ -311,11 +271,11 @@ function TextToSignMode() {
             {fullApiResponse && (
               <details className="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <summary className="font-medium text-gray-700 dark:text-gray-300 cursor-pointer hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                  Show AI Response Details
+                  {/* Show AI Response Details */}
                 </summary>
                 <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                   <pre className="whitespace-pre-wrap text-sm text-gray-600 dark:text-gray-400 p-2 bg-gray-100 dark:bg-gray-800/80 rounded overflow-auto max-h-40">
-                    {fullApiResponse}
+                    {/* {fullApiResponse} */}
                   </pre>
                 </div>
               </details>
